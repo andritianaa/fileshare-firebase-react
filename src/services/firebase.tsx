@@ -1,31 +1,33 @@
+import { Auth, GoogleAuthProvider, User, UserCredential, getAuth, signInWithPopup, signOut } from "firebase/auth"
+import { CollectionReference, Firestore, QuerySnapshot, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore"
+import { FirebaseStorage, UploadTask, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import { FileData } from "./models/FileData"
+import { UserData } from './models/userData'
 import { initializeApp } from "firebase/app"
-import config from './config.json'
 import { uuidv4 } from '@firebase/util'
-import { Auth, GoogleAuthProvider, User, UserCredential, getAuth, signInWithPopup, signOut } from "firebase/auth";
-import { CollectionReference, Firestore, collection, doc, getFirestore, setDoc } from "firebase/firestore";
-import { FileData } from "./models/FileData";
-import { FirebaseStorage, UploadTask, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
-import { UserData } from './models/userData';
 import { customAlphabet } from 'nanoid'
+import config from './config.json'
+
 class FirebaseService {
-    auth: Auth
-    firestore: Firestore
+
+    usersCollection: CollectionReference<UserData>
     filesCollection: CollectionReference<FileData>
     googleAuthProvider: GoogleAuthProvider
     storage: FirebaseStorage
-    usersCollection: CollectionReference<UserData>
+    firestore: Firestore
+    auth: Auth
 
     constructor() {
         initializeApp(config)
         this.auth = getAuth()
+        this.storage = getStorage()
         this.auth.useDeviceLanguage()
+        this.firestore = getFirestore()
         this.googleAuthProvider = new GoogleAuthProvider()
 
-        this.firestore = getFirestore()
         this.filesCollection = collection(this.firestore, 'files') as CollectionReference<FileData>
         this.usersCollection = collection(this.firestore, 'users') as CollectionReference<UserData>
 
-        this.storage = getStorage()
     }
 
 
@@ -59,7 +61,7 @@ class FirebaseService {
 
     async addFile(originalFilename: string, uniqueFilename: string): Promise<string> {
         const id = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8)().toUpperCase()
-        await setDoc(doc(this.filesCollection, uniqueFilename), {
+        await setDoc(doc(this.filesCollection, id), {
             id: id,
             uniqueFilename: uniqueFilename,
             originalFilename: originalFilename,
@@ -68,6 +70,23 @@ class FirebaseService {
         return id
     }
 
+    async getSingleFile(id: string): Promise<FileData> {
+        const fileData = await getDoc(doc(this.filesCollection, id))
+        return fileData.data()
+    }
+    async getSingleUser(id: string): Promise<UserData> {
+        const userData = await getDoc(doc(this.usersCollection, id))
+        return userData.data()
+    }
+
+
+    async getFilesSentByCurrentUser(): Promise<FileData[]> {
+        const files: FileData[] = []
+        const q = query(this.filesCollection, where('userId', '==', this.auth.currentUser.uid))
+        const querySnapshot = await getDocs(q)
+        querySnapshot.docs.forEach(doc => { files.push(doc.data()) })
+        return files
+    }
 }
 
-export default new FirebaseService();
+export default new FirebaseService()
