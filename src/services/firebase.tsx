@@ -1,4 +1,4 @@
-import { Auth, GoogleAuthProvider, User, UserCredential, getAuth, getRedirectResult, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth"
+import { Auth, GoogleAuthProvider, User, UserCredential, getAuth, signInWithPopup, signOut } from "firebase/auth"
 import { CollectionReference, Firestore, QuerySnapshot, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore"
 import { FirebaseStorage, UploadTask, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { FileData } from "./models/FileData"
@@ -39,11 +39,8 @@ class FirebaseService {
     }
     async signinWithGoogle(): Promise<UserCredential> {
         try {
-            await signInWithRedirect(this.auth, this.googleAuthProvider)
-            const userCredential = await getRedirectResult(this.auth);
+            const userCredential = await signInWithPopup(this.auth, this.googleAuthProvider)
             await this.addUser(userCredential.user)
-
-
         } catch (error) {
             return null
         }
