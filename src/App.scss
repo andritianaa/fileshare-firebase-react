@@ -1,1 +1,26 @@
-@import "node_modules/bootstrap/scss/bootstrap"
+@import "node_modules/bootstrap/scss/bootstrap";
+
+
+* {
+    transition: all 0.2s ease-in-out !important;
+}
+
+#google {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    height: 64px;
+    width: 64px;
+    cursor: pointer;
+    border: solid 1px #d2d2d2;
+    border-radius: 4px;
+
+    &:hover {
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3))
+    }
+}
+
+.navbar-custom .navbar-toggler {
+    color: #fff !important;
+    border-color: #fff !important;
+}
