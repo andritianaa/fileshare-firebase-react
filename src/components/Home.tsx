@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
 import firebaseService from './../services/firebase'
 
 export default function Home() {
-    const MAX_FILE_SIZE_IN_MB = 10
+    const MAX_FILE_SIZE_IN_MB = 20
 
     const [file, setFile] = useState<File>()
     const [fileInputRef, setFileInputRef] = useState<HTMLInputElement>()
