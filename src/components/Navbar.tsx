@@ -15,14 +15,14 @@ export default function Navbar() {
                 <ReactNavbar.Collapse id="ReactNavbar-nav">
                     <Nav className="me-auto">
                         <Link to="/" className="nav-link text-white">
-                            Upload
+                            Envoyer
                         </Link>
                         <Link to="/files" className="nav-link text-white">
-                            Search
+                            Rechercher
                         </Link>
                         {currentUser && (
                             <Link to="/sent" className="nav-link text-white">
-                                My files
+                                Mes fichiers
                             </Link>
                         )}
                     </Nav>
